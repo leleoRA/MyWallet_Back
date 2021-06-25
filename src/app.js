@@ -3,16 +3,13 @@ import cors from 'cors';
 import bcrypt from 'bcrypt';
 import joi from 'joi';
 import {v4 as uuidv4} from 'uuid';
-import dayjs from 'dayjs';
+
 import connection from './database.js';
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.get('/teste', (req, res) => {
-    res.sendStatus(200);
-});
 
 /* ---------------------- Sign-up ---------------------- */
 
@@ -82,7 +79,6 @@ app.post('/login', async (req, res) => {
             , [token]);
 
             res.send(result.rows[0])
-            console.log(result.rows[0])
 
         } else{
             return res.sendStatus(401);
