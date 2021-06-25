@@ -68,13 +68,21 @@ app.post('/login', async (req, res) => {
         if (user && bcrypt.compareSync(password, user.password)){
             const token = uuidv4();
 
-            const result = await connection.query(`
+            await connection.query(`
                 INSERT INTO sessions
                 ("userId", token)
                 VALUES ($1, $2)`
                 , [user.id, token]);
 
-            res.send(token)
+            const result = await connection.query(`
+            SELECT token, name FROM sessions
+            JOIN users
+            ON sessions."userId" = users.id
+            WHERE sessions.token = $1`
+            , [token]);
+
+            res.send(result.rows[0])
+            console.log(result.rows[0])
 
         } else{
             return res.sendStatus(401);
@@ -128,7 +136,7 @@ app.post('/finances', async (req, res) => {
     const token = authorization?.replace("Bearer ", "");
 
     const financeSchema = joi.object({
-        value: joi.number().integer().required(),
+        value: joi.number().required(),
         description: joi.string().min(1).max(20).required(),
     });
 
